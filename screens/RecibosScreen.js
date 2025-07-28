@@ -4,7 +4,7 @@ import { Text, Card, IconButton, List, FAB, Provider as PaperProvider } from 're
 import { supabase } from '../lib/supabase';
 import { Modal, Portal } from 'react-native-paper';
 import RecibosModal from './RecibosModal';
-
+import { useNavigation } from '@react-navigation/native';
 
 export default function RecibosScreen() {
   const [recibos, setRecibos] = useState([]);
@@ -76,7 +76,7 @@ export default function RecibosScreen() {
       <FAB
         icon="plus"
         style={styles.fab}
-        onPress={() => setModalVisible(true)}
+        onPress={() => navigation.navigate('RecibosForm')}
       />
     </PaperProvider>
   );
