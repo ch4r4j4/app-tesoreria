@@ -1,22 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { Text, Card, IconButton, List, FAB, Provider as PaperProvider } from 'react-native-paper';
+import { Text, Card, IconButton, FAB, Provider as PaperProvider } from 'react-native-paper';
 import { supabase } from '../lib/supabase';
-import { Modal, Portal } from 'react-native-paper';
-import RecibosModal from './RecibosModal';
 import { useNavigation } from '@react-navigation/native';
 
 export default function RecibosScreen() {
+  const navigation = useNavigation();
   const [recibos, setRecibos] = useState([]);
   const [expandedId, setExpandedId] = useState(null);
-  const [modalVisible, setModalVisible] = useState(false); // nuevo estado
 
   const toggleExpand = (id) => {
     setExpandedId(expandedId === id ? null : id);
   };
 
   const cargarRecibos = async () => {
-    const { data, error } = await supabase.from('Recibos').select('*').order('fecha', { ascending: false });
+    const { data, error } = await supabase
+      .from('Recibos')
+      .select('*')
+      .order('fecha', { ascending: false });
+
     if (!error) {
       setRecibos(data);
     }
@@ -60,19 +62,6 @@ export default function RecibosScreen() {
         ))}
       </ScrollView>
 
-      <Portal>
-        <Modal
-          visible={modalVisible}
-          onDismiss={() => setModalVisible(false)}
-          contentContainerStyle={styles.modalWrapper}
-        >
-          <RecibosModal
-            onClose={() => setModalVisible(false)}
-            onSaved={cargarRecibos}
-          />
-        </Modal>
-      </Portal>
-
       <FAB
         icon="plus"
         style={styles.fab}
@@ -81,7 +70,6 @@ export default function RecibosScreen() {
     </PaperProvider>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
@@ -108,11 +96,5 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 20,
     bottom: 20
-  },
-  modalWrapper: {
-  backgroundColor: 'white',
-  margin: 20,
-  borderRadius: 10,
-  padding: 20
-  },
+  }
 });
