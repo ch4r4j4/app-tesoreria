@@ -48,6 +48,17 @@ export default function RecibosFormScreen({ navigation }) {
   return (
     <ScrollView contentContainerStyle={styles.container}>
 
+      <Text style={styles.label}>Tipo de Registro</Text>
+      <View style={styles.pickerContainer}>
+        <Picker
+          selectedValue={tipoRecibo}
+          onValueChange={(itemValue) => setTipoRecibo(itemValue)}
+        >
+          <Picker.Item label="Ingreso" value="Ingreso" />
+          <Picker.Item label="Egreso" value="Egreso" />
+        </Picker>
+      </View>
+
 			<Text style={styles.label}>Nuevo Recibo</Text>
 
 			<Button mode="outlined" onPress={() => setShowDatePicker(true)} style={styles.input}>
