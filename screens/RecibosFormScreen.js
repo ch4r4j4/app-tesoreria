@@ -48,8 +48,8 @@ export default function RecibosFormScreen({ navigation }) {
   };
 
 	const guardarRecibo = async () => {
-		if (!fecha || !monto || !tipo) {
-			alert('Los campos fecha, monto y tipo son obligatorios');
+		if (!fecha || !nombre) {
+			alert('el campo nombre es obligatorio');
 			return;
 		}
 
@@ -103,6 +103,156 @@ export default function RecibosFormScreen({ navigation }) {
         />
       )}
 
+      <Text style={styles.label}>Nombre del Recibo</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Monto"
+        value={monto}
+				keyboardType='numeric'
+        onChangeText={setMonto}
+      />
+
+      <Text style={styles.label}>Monto</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Tipo"
+        value={tipo}
+        onChangeText={setTipo}
+      />
+
+			<Text style={styles.label}>Descripción</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="descripcion"
+        value={descripcion}
+        onChangeText={setDescripcion}
+				multiline
+      />
+
+      <Text style={styles.label}>Nombre</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Nombre"
+        value={nombre}
+        onChangeText={setMonto}
+      />
+
+      <Text style={styles.label}>Monto</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Tipo"
+        value={tipo}
+        onChangeText={setTipo}
+      />
+
+			<Text style={styles.label}>Descripción</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="descripcion"
+        value={descripcion}
+        onChangeText={setDescripcion}
+				multiline
+      />
+      <Text style={styles.label}>Nombre del Recibo</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Monto"
+        value={monto}
+				keyboardType='numeric'
+        onChangeText={setMonto}
+      />
+
+      <Text style={styles.label}>Monto</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Tipo"
+        value={tipo}
+        onChangeText={setTipo}
+      />
+
+			<Text style={styles.label}>Descripción</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="descripcion"
+        value={descripcion}
+        onChangeText={setDescripcion}
+				multiline
+      />
+      <Text style={styles.label}>Nombre del Recibo</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Monto"
+        value={monto}
+				keyboardType='numeric'
+        onChangeText={setMonto}
+      />
+
+      <Text style={styles.label}>Monto</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Tipo"
+        value={tipo}
+        onChangeText={setTipo}
+      />
+
+			<Text style={styles.label}>Descripción</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="descripcion"
+        value={descripcion}
+        onChangeText={setDescripcion}
+				multiline
+      />
+      <Text style={styles.label}>Nombre del Recibo</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Monto"
+        value={monto}
+				keyboardType='numeric'
+        onChangeText={setMonto}
+      />
+
+      <Text style={styles.label}>Monto</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Tipo"
+        value={tipo}
+        onChangeText={setTipo}
+      />
+
+			<Text style={styles.label}>Descripción</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="descripcion"
+        value={descripcion}
+        onChangeText={setDescripcion}
+				multiline
+      />
+      <Text style={styles.label}>Nombre del Recibo</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Monto"
+        value={monto}
+				keyboardType='numeric'
+        onChangeText={setMonto}
+      />
+
+      <Text style={styles.label}>Monto</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Tipo"
+        value={tipo}
+        onChangeText={setTipo}
+      />
+
+			<Text style={styles.label}>Descripción</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="descripcion"
+        value={descripcion}
+        onChangeText={setDescripcion}
+				multiline
+      />
       <Text style={styles.label}>Nombre del Recibo</Text>
       <TextInput
         style={styles.input}
