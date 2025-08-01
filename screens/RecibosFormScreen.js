@@ -3,7 +3,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
 import { supabase } from '../lib/supabase';
 import { Picker } from '@react-native-picker/picker';
-import {  Button } from 'react-native-paper';
+import {  Button, ProgressBar } from 'react-native-paper';
 import { Dropdown } from 'react-native-element-dropdown';
 
 const data = [
@@ -14,30 +14,27 @@ const data = [
 export default function RecibosFormScreen({ navigation }) {
   const [fecha, setFecha] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
-	const [tipo, setTipo] = useState('');
-	const [descripcion, setDescripcion] = useState('');
   const [nombre, setNombre] = useState('');
-  const [monto, setMonto] = useState('');
   const [tipoRecibo, setTipoRecibo] = useState('Ingreso'); // Nuevo selector
 
-  const [primicia,setPrimicia] = useState('');
-  const [diezmo, setDiezmo] = useState('');
-  const [oobres, setPobres] = useState('');
-  const [agradecimiento, setAgradecimiento] = useState('');
-  const [esc_sabatica, setEscsabatica] = useState('');
-  const [jovenes, setJovenes] = useState('');
-  const [adolescentes, setAdolescentes] = useState('');
-  const [ninos, setNinos] = useState('');
-  const [educacion, setEducacion] = useState('');
-  const [salud, setSalud] = useState('');
-  const [obra_mis, setObramis] = useState('');
-  const [musica, setMusica] = useState('');
-  const [renuevatv, setRenuevatv] = useState('');
-  const [primer_sabado, setPrimersab] = useState('');
-  const [sem_oracion, setSemorac] = useState('');
-  const [mis_extranj, setMisextran] = useState('');
-  const [construccion, setConstruc] = useState('');
-  const [diversos, setDiversos] = useState('');
+  const [primicia,setPrimicia] = useState(0);
+  const [diezmo, setDiezmo] = useState(0);
+  const [pobres, setPobres] = useState(0);
+  const [agradecimiento, setAgradecimiento] = useState(0);
+  const [esc_sabatica, setEscsabatica] = useState(0);
+  const [jovenes, setJovenes] = useState(0);
+  const [adolescentes, setAdolescentes] = useState(0);
+  const [ninos, setNinos] = useState(0);
+  const [educacion, setEducacion] = useState(0);
+  const [salud, setSalud] = useState(0);
+  const [obra_mis, setObramis] = useState(0);
+  const [musica, setMusica] = useState(0);
+  const [renuevatv, setRenuevatv] = useState(0);
+  const [primer_sabado, setPrimersab] = useState(0);
+  const [sem_oracion, setSemorac] = useState(0);
+  const [mis_extranj, setMisextran] = useState(0);
+  const [construccion, setConstruc] = useState(0);
+  const [diversos, setDiversos] = useState(0);
 
 	const formatDate = (date) => date.toLocaleDateString('en-CA');
 
@@ -47,7 +44,7 @@ export default function RecibosFormScreen({ navigation }) {
     setFecha(currentDate);
   };
 
-	const guardarRecibo = async () => {
+  const guardarRecibo = async () => {
 		if (!fecha || !nombre) {
 			alert('el campo nombre es obligatorio');
 			return;
@@ -55,12 +52,32 @@ export default function RecibosFormScreen({ navigation }) {
 
 		const fechaString = formatDate(fecha);
 
-		const { error } = await supabase.from('Recibos').insert([{
-			fecha: fechaString,
-			monto: parseFloat(monto),
-			tipo,
-			descripcion
-		}]);
+    const tabla = tipoRecibo === 'Ingreso' ? 'ReciboIg' : 'egresos';
+
+    const data = {
+      fecha: fechaString,
+      nombre,
+			primicia,
+      diezmo,
+      pobres,
+      agradecimiento,
+      esc_sabatica,
+      jovenes,
+      adolescentes,
+      ninos,
+      educacion,
+      salud,
+      obra_mis,
+      musica,
+      renuevatv,
+      primer_sabado,
+      sem_oracion,
+      mis_extranj,
+      construccion,
+      diversos,
+    }
+
+		const { error } = await supabase.from(tabla).insert(data);
 
 		if (error) {
 			alert('Error al guardar: ' + error.message);
@@ -103,180 +120,168 @@ export default function RecibosFormScreen({ navigation }) {
         />
       )}
 
-      <Text style={styles.label}>Nombre del Recibo</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Monto"
-        value={monto}
-				keyboardType='numeric'
-        onChangeText={setMonto}
-      />
-
-      <Text style={styles.label}>Monto</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Tipo"
-        value={tipo}
-        onChangeText={setTipo}
-      />
-
-			<Text style={styles.label}>Descripción</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="descripcion"
-        value={descripcion}
-        onChangeText={setDescripcion}
-				multiline
-      />
-
       <Text style={styles.label}>Nombre</Text>
       <TextInput
         style={styles.input}
         placeholder="Nombre"
         value={nombre}
-        onChangeText={setMonto}
+        onChangeText={setNombre}
       />
 
-      <Text style={styles.label}>Monto</Text>
+      <Text style={styles.label}>Primicia</Text>
       <TextInput
         style={styles.input}
-        placeholder="Tipo"
-        value={tipo}
-        onChangeText={setTipo}
+        placeholder="Primicia"
+        value={primicia}
+        keyboardType='numeric'
+        onChangeText={setPrimicia}
       />
 
-			<Text style={styles.label}>Descripción</Text>
+			<Text style={styles.label}>Diezmo</Text>
       <TextInput
         style={styles.input}
-        placeholder="descripcion"
-        value={descripcion}
-        onChangeText={setDescripcion}
-				multiline
+        placeholder="Diezmo"
+        value={diezmo}
+        keyboardType='numeric'
+        onChangeText={setDiezmo}
       />
-      <Text style={styles.label}>Nombre del Recibo</Text>
+      <Text style={styles.label}>Pobres</Text>
       <TextInput
         style={styles.input}
-        placeholder="Monto"
-        value={monto}
+        placeholder="Pobres"
+        value={pobres}
 				keyboardType='numeric'
-        onChangeText={setMonto}
+        onChangeText={setPobres}
       />
 
-      <Text style={styles.label}>Monto</Text>
+      <Text style={styles.label}>Agradecimiento</Text>
       <TextInput
         style={styles.input}
-        placeholder="Tipo"
-        value={tipo}
-        onChangeText={setTipo}
+        placeholder="Agradecimeinto"
+        value={agradecimiento}
+        keyboardType='numeric'
+        onChangeText={setAgradecimiento}
       />
 
-			<Text style={styles.label}>Descripción</Text>
+			<Text style={styles.label}>Esc Sabataica</Text>
       <TextInput
         style={styles.input}
-        placeholder="descripcion"
-        value={descripcion}
-        onChangeText={setDescripcion}
-				multiline
-      />
-      <Text style={styles.label}>Nombre del Recibo</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Monto"
-        value={monto}
+        placeholder="Escuela Sabatica"
+        value={esc_sabatica}
+        onChangeText={setEscsabatica}
 				keyboardType='numeric'
-        onChangeText={setMonto}
       />
-
-      <Text style={styles.label}>Monto</Text>
+      <Text style={styles.label}>Jovenes</Text>
       <TextInput
         style={styles.input}
-        placeholder="Tipo"
-        value={tipo}
-        onChangeText={setTipo}
-      />
-
-			<Text style={styles.label}>Descripción</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="descripcion"
-        value={descripcion}
-        onChangeText={setDescripcion}
-				multiline
-      />
-      <Text style={styles.label}>Nombre del Recibo</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Monto"
-        value={monto}
+        placeholder="Jovenes"
+        value={jovenes}
 				keyboardType='numeric'
-        onChangeText={setMonto}
+        onChangeText={setJovenes}
       />
 
-      <Text style={styles.label}>Monto</Text>
+      <Text style={styles.label}>Adolescentes</Text>
       <TextInput
         style={styles.input}
-        placeholder="Tipo"
-        value={tipo}
-        onChangeText={setTipo}
+        placeholder="Adolescentes"
+        value={adolescentes}
+        onChangeText={setAdolescentes}
+        keyboardType='numeric'
       />
 
-			<Text style={styles.label}>Descripción</Text>
+			<Text style={styles.label}>Niños</Text>
       <TextInput
         style={styles.input}
-        placeholder="descripcion"
-        value={descripcion}
-        onChangeText={setDescripcion}
-				multiline
+        placeholder="Niños"
+        value={ninos}
+        onChangeText={setNinos}
+        keyboardType='numeric'
       />
-      <Text style={styles.label}>Nombre del Recibo</Text>
+      <Text style={styles.label}>Educacion</Text>
       <TextInput
         style={styles.input}
-        placeholder="Monto"
-        value={monto}
+        placeholder="Educacion"
+        value={educacion}
 				keyboardType='numeric'
-        onChangeText={setMonto}
+        onChangeText={setEducacion}
       />
 
-      <Text style={styles.label}>Monto</Text>
+      <Text style={styles.label}>Salud</Text>
       <TextInput
         style={styles.input}
-        placeholder="Tipo"
-        value={tipo}
-        onChangeText={setTipo}
+        placeholder="Salud"
+        value={salud}
+        keyboardType='numeric'
+        onChangeText={setSalud}
       />
 
-			<Text style={styles.label}>Descripción</Text>
+			<Text style={styles.label}>Obra Misionera</Text>
       <TextInput
         style={styles.input}
-        placeholder="descripcion"
-        value={descripcion}
-        onChangeText={setDescripcion}
-				multiline
+        placeholder="Obra Misionera"
+        value={obra_mis}
+        keyboardType='numeric'
+        onChangeText={setObramis}
       />
-      <Text style={styles.label}>Nombre del Recibo</Text>
+      <Text style={styles.label}>Musica</Text>
       <TextInput
         style={styles.input}
-        placeholder="Monto"
-        value={monto}
+        placeholder="Musica"
+        value={musica}
 				keyboardType='numeric'
-        onChangeText={setMonto}
+        onChangeText={setMusica}
       />
 
-      <Text style={styles.label}>Monto</Text>
+      <Text style={styles.label}>Renueva TV</Text>
       <TextInput
         style={styles.input}
-        placeholder="Tipo"
-        value={tipo}
-        onChangeText={setTipo}
+        placeholder="Renueva Tv"
+        value={renuevatv}
+        keyboardType='numeric'
+        onChangeText={setRenuevatv}
       />
 
-			<Text style={styles.label}>Descripción</Text>
+			<Text style={styles.label}>1er Sabado</Text>
       <TextInput
         style={styles.input}
-        placeholder="descripcion"
-        value={descripcion}
-        onChangeText={setDescripcion}
-				multiline
+        placeholder="1er Sabado"
+        value={primer_sabado}
+        keyboardType='numeric'
+        onChangeText={setPrimersab}
+      />
+      <Text style={styles.label}>Semana de Oracion</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Sem. Oracion"
+        value={sem_oracion}
+				keyboardType='numeric'
+        onChangeText={setSemorac}
+      />
+
+      <Text style={styles.label}>Mis Extranjera</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Mis Extranjera"
+        value={mis_extranj}
+        keyboardType='numeric'
+        onChangeText={setMisextran}
+      />
+
+			<Text style={styles.label}>Construccion</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Construccion"
+        value={construccion}
+        keyboardType='numeric'
+        onChangeText={setConstruc}
+      />
+      <Text style={styles.label}>Diversos</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Diversos"
+        value={diversos}
+        keyboardType='numeric'
+        onChangeText={setDiversos}
       />
 
       <TouchableOpacity style={styles.button} onPress={guardarRecibo}>
