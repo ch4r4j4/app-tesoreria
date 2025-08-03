@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
 import { supabase } from '../lib/supabase';
@@ -16,6 +16,7 @@ export default function RecibosFormScreen({ navigation }) {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [nombre, setNombre] = useState('');
   const [tipoRecibo, setTipoRecibo] = useState('Ingreso'); // Nuevo selector
+  const [totalrcb, setTotalrcb] = useState(0);
 
   const [primicia,setPrimicia] = useState(0);
   const [diezmo, setDiezmo] = useState(0);
@@ -35,6 +36,30 @@ export default function RecibosFormScreen({ navigation }) {
   const [mis_extranj, setMisextran] = useState(0);
   const [construccion, setConstruc] = useState(0);
   const [diversos, setDiversos] = useState(0);
+
+  const calcularTotal = () => {
+    const suma =
+    parseFloat(primicia) +
+    parseFloat(diezmo) +
+    parseFloat(pobres) +
+    parseFloat(agradecimiento) +
+    parseFloat(esc_sabatica) +
+    parseFloat(jovenes) +
+    parseFloat(adolescentes) +
+    parseFloat(ninos) +
+    parseFloat(educacion) +
+    parseFloat(salud) +
+    parseFloat(obra_mis) +
+    parseFloat(musica) +
+    parseFloat(renuevatv) +
+    parseFloat(primer_sabado) +
+    parseFloat(sem_oracion) +
+    parseFloat(mis_extranj) +
+    parseFloat(construccion) +
+    parseFloat(diversos);
+
+    setTotalrcb(suma);
+  };
 
 	const formatDate = (date) => date.toLocaleDateString('en-CA');
 
@@ -75,6 +100,7 @@ export default function RecibosFormScreen({ navigation }) {
       mis_extranj,
       construccion,
       diversos,
+      totalrcb,
     }
 
 		const { error } = await supabase.from(tabla).insert(data);
@@ -86,208 +112,285 @@ export default function RecibosFormScreen({ navigation }) {
 			navigation.goBack();
 		}
 	};
+
+  useEffect(() => {
+    calcularTotal();
+  }, [
+    primicia, diezmo, pobres, agradecimiento, esc_sabatica, jovenes,
+    adolescentes, ninos, educacion, salud, obra_mis, musica,
+    renuevatv, primer_sabado, sem_oracion, mis_extranj,
+    construccion, diversos
+  ]);
 	
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.dropdownContainer}>
-        <Dropdown
-          style={styles.dropdown}
-          placeholderStyle={styles.placeholderStyle}
-          selectedTextStyle={styles.selectedTextStyle}
-          data={data}
-          labelField="label"
-          valueField="value"
-          placeholder="Selecciona tipo"
-          value={tipoRecibo}
-          onChange={(item) => {
-            setTipoRecibo(item.value);
+    <View style={{ flex: 1 }}>
+      <View
+        style={{
+          padding: 10,
+          backgroundColor: '#f0f0f0',
+          borderBottomWidth: 1,
+          borderColor: '#ccc',
+        }}
+      >
+        <Text style={{ fontWeight: 'bold', fontSize: 16 }}>
+          Total: S/.{totalrcb.toFixed(2)}
+        </Text>
+      </View>
+      <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.dropdownContainer}>
+          <Dropdown
+            style={styles.dropdown}
+            placeholderStyle={styles.placeholderStyle}
+            selectedTextStyle={styles.selectedTextStyle}
+            data={data}
+            labelField="label"
+            valueField="value"
+            placeholder="Selecciona tipo"
+            value={tipoRecibo}
+            onChange={(item) => {
+              setTipoRecibo(item.value);
+            }}
+          />
+        </View>
+
+        <Text style={styles.label}>Nuevo Recibo</Text>
+
+        <Button mode="outlined" onPress={() => setShowDatePicker(true)} style={styles.input}>
+          Fecha: {formatDate(fecha)}
+        </Button>
+
+        {showDatePicker && (
+          <DateTimePicker
+            value={fecha}
+            mode="date"
+            display="default"
+            onChange={onChangeDate}
+          />
+        )}
+
+        <Text style={styles.label}>Nombre</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Nombre"
+          value={nombre}
+          onChangeText={setNombre}
+        />
+
+        <Text style={styles.label}>Primicia</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Primicia"
+          value={primicia}
+          keyboardType='numeric'
+          onChangeText={(text) => {
+            setPrimicia(text);
+            calcularTotal();
           }}
         />
-      </View>
 
-			<Text style={styles.label}>Nuevo Recibo</Text>
-
-			<Button mode="outlined" onPress={() => setShowDatePicker(true)} style={styles.input}>
-        Fecha: {formatDate(fecha)}
-      </Button>
-
-			{showDatePicker && (
-        <DateTimePicker
-          value={fecha}
-          mode="date"
-          display="default"
-          onChange={onChangeDate}
+        <Text style={styles.label}>Diezmo</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Diezmo"
+          value={diezmo}
+          keyboardType='numeric'
+          onChangeText={(text) => {
+            setDiezmo(text);
+            calcularTotal();
+          }}
         />
-      )}
+        <Text style={styles.label}>Pobres</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Pobres"
+          value={pobres}
+          keyboardType='numeric'
+          onChangeText={(text) => {
+            setPobres(text);
+            calcularTotal();
+          }}
+        />
 
-      <Text style={styles.label}>Nombre</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Nombre"
-        value={nombre}
-        onChangeText={setNombre}
-      />
+        <Text style={styles.label}>Agradecimiento</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Agradecimeinto"
+          value={agradecimiento}
+          keyboardType='numeric'
+          onChangeText={(text) => {
+            setAgradecimiento(text);
+            calcularTotal();
+          }}
+        />
 
-      <Text style={styles.label}>Primicia</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Primicia"
-        value={primicia}
-        keyboardType='numeric'
-        onChangeText={setPrimicia}
-      />
+        <Text style={styles.label}>Esc Sabataica</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Escuela Sabatica"
+          value={esc_sabatica}
+          onChangeText={(text) => {
+            setEscsabatica(text);
+            calcularTotal();
+          }}
+          keyboardType='numeric'
+        />
+        <Text style={styles.label}>Jovenes</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Jovenes"
+          value={jovenes}
+          keyboardType='numeric'
+          onChangeText={(text) => {
+            setJovenes(text);
+            calcularTotal();
+          }}
+        />
 
-			<Text style={styles.label}>Diezmo</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Diezmo"
-        value={diezmo}
-        keyboardType='numeric'
-        onChangeText={setDiezmo}
-      />
-      <Text style={styles.label}>Pobres</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Pobres"
-        value={pobres}
-				keyboardType='numeric'
-        onChangeText={setPobres}
-      />
+        <Text style={styles.label}>Adolescentes</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Adolescentes"
+          value={adolescentes}
+          onChangeText={(text) => {
+            setAdolescentes(text);
+            calcularTotal();
+          }}
+          keyboardType='numeric'
+        />
 
-      <Text style={styles.label}>Agradecimiento</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Agradecimeinto"
-        value={agradecimiento}
-        keyboardType='numeric'
-        onChangeText={setAgradecimiento}
-      />
+        <Text style={styles.label}>Niños</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Niños"
+          value={ninos}
+          onChangeText={(text) => {
+            setNinos(text);
+            calcularTotal();
+          }}
+          keyboardType='numeric'
+        />
+        <Text style={styles.label}>Educacion</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Educacion"
+          value={educacion}
+          keyboardType='numeric'
+          onChangeText={(text) => {
+            setEducacion(text);
+            calcularTotal();
+          }}
+        />
 
-			<Text style={styles.label}>Esc Sabataica</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Escuela Sabatica"
-        value={esc_sabatica}
-        onChangeText={setEscsabatica}
-				keyboardType='numeric'
-      />
-      <Text style={styles.label}>Jovenes</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Jovenes"
-        value={jovenes}
-				keyboardType='numeric'
-        onChangeText={setJovenes}
-      />
+        <Text style={styles.label}>Salud</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Salud"
+          value={salud}
+          keyboardType='numeric'
+          onChangeText={(text) => {
+            setSalud(text);
+            calcularTotal();
+          }}
+        />
 
-      <Text style={styles.label}>Adolescentes</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Adolescentes"
-        value={adolescentes}
-        onChangeText={setAdolescentes}
-        keyboardType='numeric'
-      />
+        <Text style={styles.label}>Obra Misionera</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Obra Misionera"
+          value={obra_mis}
+          keyboardType='numeric'
+          oonChangeText={(text) => {
+            setObramis(text);
+            calcularTotal();
+          }}
+        />
+        <Text style={styles.label}>Musica</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Musica"
+          value={musica}
+          keyboardType='numeric'
+          onChangeText={(text) => {
+            setMusica(text);
+            calcularTotal();
+          }}
+        />
 
-			<Text style={styles.label}>Niños</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Niños"
-        value={ninos}
-        onChangeText={setNinos}
-        keyboardType='numeric'
-      />
-      <Text style={styles.label}>Educacion</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Educacion"
-        value={educacion}
-				keyboardType='numeric'
-        onChangeText={setEducacion}
-      />
+        <Text style={styles.label}>Renueva TV</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Renueva Tv"
+          value={renuevatv}
+          keyboardType='numeric'
+          onChangeText={(text) => {
+            setRenuevatv(text);
+            calcularTotal();
+          }}
+        />
 
-      <Text style={styles.label}>Salud</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Salud"
-        value={salud}
-        keyboardType='numeric'
-        onChangeText={setSalud}
-      />
+        <Text style={styles.label}>1er Sabado</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="1er Sabado"
+          value={primer_sabado}
+          keyboardType='numeric'
+          onChangeText={(text) => {
+            setPrimersab(text);
+            calcularTotal();
+          }}
+        />
+        <Text style={styles.label}>Semana de Oracion</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Sem. Oracion"
+          value={sem_oracion}
+          keyboardType='numeric'
+          onChangeText={(text) => {
+            setSemorac(text);
+            calcularTotal();
+          }}
+        />
 
-			<Text style={styles.label}>Obra Misionera</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Obra Misionera"
-        value={obra_mis}
-        keyboardType='numeric'
-        onChangeText={setObramis}
-      />
-      <Text style={styles.label}>Musica</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Musica"
-        value={musica}
-				keyboardType='numeric'
-        onChangeText={setMusica}
-      />
+        <Text style={styles.label}>Mis Extranjera</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Mis Extranjera"
+          value={mis_extranj}
+          keyboardType='numeric'
+          onChangeText={(text) => {
+            setMisextran(text);
+            calcularTotal();
+          }}
+        />
 
-      <Text style={styles.label}>Renueva TV</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Renueva Tv"
-        value={renuevatv}
-        keyboardType='numeric'
-        onChangeText={setRenuevatv}
-      />
+        <Text style={styles.label}>Construccion</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Construccion"
+          value={construccion}
+          keyboardType='numeric'
+          onChangeText={(text) => {
+            setConstruc(text);
+            calcularTotal();
+          }}
+        />
+        <Text style={styles.label}>Diversos</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Diversos"
+          value={diversos}
+          keyboardType='numeric'
+          onChangeText={(text) => {
+            setDiversos(text);
+            calcularTotal();
+          }}
+        />
 
-			<Text style={styles.label}>1er Sabado</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="1er Sabado"
-        value={primer_sabado}
-        keyboardType='numeric'
-        onChangeText={setPrimersab}
-      />
-      <Text style={styles.label}>Semana de Oracion</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Sem. Oracion"
-        value={sem_oracion}
-				keyboardType='numeric'
-        onChangeText={setSemorac}
-      />
-
-      <Text style={styles.label}>Mis Extranjera</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Mis Extranjera"
-        value={mis_extranj}
-        keyboardType='numeric'
-        onChangeText={setMisextran}
-      />
-
-			<Text style={styles.label}>Construccion</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Construccion"
-        value={construccion}
-        keyboardType='numeric'
-        onChangeText={setConstruc}
-      />
-      <Text style={styles.label}>Diversos</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Diversos"
-        value={diversos}
-        keyboardType='numeric'
-        onChangeText={setDiversos}
-      />
-
-      <TouchableOpacity style={styles.button} onPress={guardarRecibo}>
-        <Text style={styles.buttonText}>Guardar Recibo</Text>
-      </TouchableOpacity>
-    </ScrollView>
+        <TouchableOpacity style={styles.button} onPress={guardarRecibo}>
+          <Text style={styles.buttonText}>Guardar Recibo</Text>
+        </TouchableOpacity>
+      </ScrollView>
+    </View>
   );
 }
 
