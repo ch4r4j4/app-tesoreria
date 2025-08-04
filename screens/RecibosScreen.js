@@ -15,7 +15,7 @@ export default function RecibosScreen() {
 
   const cargarRecibos = async () => {
     const { data, error } = await supabase
-      .from('Recibos')
+      .from('ReciboIg')
       .select('*')
       .order('fecha', { ascending: false });
 
@@ -36,9 +36,8 @@ export default function RecibosScreen() {
         {recibos.map((recibo) => (
           <Card key={recibo.id} style={styles.card}>
             <Card.Title
-              title={recibo.descripcion || 'Sin descripción'}
-              subtitle={`Monto: S/. ${recibo.monto} - Fecha: ${recibo.fecha}`}
-              left={() => <View style={styles.avatar} />}
+              title={recibo.nombre || 'Sin descripción'}
+              subtitle={`Nombre ${recibo.totalrcb} - Fecha: ${recibo.fecha}`}
               right={() => (
                 <View style={styles.iconContainer}>
                   <IconButton
@@ -54,8 +53,8 @@ export default function RecibosScreen() {
             />
             {expandedId === recibo.id && (
               <Card.Content>
-                <Text variant="bodyMedium">Tipo: {recibo.tipo}</Text>
-                <Text variant="bodyMedium">Descripción: {recibo.descripcion || 'N/A'}</Text>
+                <Text variant="bodyMedium">Diezmo: {recibo.diezmo}</Text>
+                <Text variant="bodyMedium">Descripción: {recibo.primicia || 'N/A'}</Text>
               </Card.Content>
             )}
           </Card>

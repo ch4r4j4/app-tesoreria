@@ -1,131 +1,122 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, Alert, ScrollView, Platform } from 'react-native';
-import { Text, Button, Provider as PaperProvider } from 'react-native-paper';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import React, { useEffect, useState } from 'react';
+import { ScrollView, StyleSheet, View } from 'react-native';
+import { Text, Card, IconButton, FAB, Provider as PaperProvider } from 'react-native-paper';
 import { supabase } from '../lib/supabase';
+import { useNavigation } from '@react-navigation/native';
+import { generarReportePDF } from '../utils/pdfReportGenerator';
+import { Menu } from 'react-native-paper';
 
-export default function ArqueoScreen() {
-  const [fechaInicio, setFechaInicio] = useState(new Date());
-  const [fechaFin, setFechaFin] = useState(new Date());
+export default function CardsScreen() {
+  const navigation = useNavigation();
+  const [arqueos, setArqueos] = useState([]);
+  const [expandedId, setExpandedId] = useState(null);
 
-  const [showInicioPicker, setShowInicioPicker] = useState(false);
-  const [showFinPicker, setShowFinPicker] = useState(false);
+  const [visibleMenuId, setVisibleMenuId] = useState(null);
 
-  // 🔧 Función para formatear fecha sin problema de zona horaria
-  const formatDate = (date) => {
-    return date.toLocaleDateString('en-CA'); // YYYY-MM-DD
+  const openMenu = (id) => setVisibleMenuId(id);
+  const closeMenu = () => setVisibleMenuId(null);
+
+  const toggleExpand = (id) => {
+    setExpandedId(expandedId === id ? null : id);
   };
 
-  const onChangeInicio = (event, selectedDate) => {
-    setShowInicioPicker(false);
-    if (selectedDate) {
-      setFechaInicio(selectedDate);
+  const cargarArqueos = async () => {
+    const { data, error } = await supabase
+      .from('arqueos')
+      .select('*')
+      .order('fecha_fin', { ascending: false });
+
+    if (!error) {
+      setArqueos(data);
+    }else{
+      console.log("error al cargar los datos", error.message)
     }
   };
 
-  const onChangeFin = (event, selectedDate) => {
-    setShowFinPicker(false);
-    if (selectedDate) {
-      setFechaFin(selectedDate);
-    }
-  };
-
-  const realizarArqueo = async () => {
-    try {
-      const fechaInicioStr = formatDate(fechaInicio);
-      const fechaFinStr = formatDate(fechaFin);
-
-      const { data: recibos, error } = await supabase
-        .from('Recibos')
-        .select('*')
-        .gte('fecha', fechaInicioStr)
-        .lte('fecha', fechaFinStr);
-
-      if (error) throw error;
-
-      const ingresos = recibos.filter(r => r.tipo.toLowerCase() === 'ingreso');
-      const egresos  = recibos.filter(r => r.tipo.toLowerCase() === 'egreso');
-
-      const totalIngresos = ingresos.reduce((sum, r) => sum + r.monto, 0);
-      const totalEgresos  = egresos.reduce((sum, r) => sum + r.monto, 0);
-
-      const saldo = totalIngresos - totalEgresos;
-
-      const saldoEnCaja        = totalIngresos * 0.50;
-      const paraOrganizacion   = totalIngresos * 0.45;
-      const paraEventualidades = totalIngresos * 0.05;
-
-      const { error: arqueoError } = await supabase.from('arqueos').insert({
-        fecha_inicio: fechaInicioStr,
-        fecha_fin: fechaFinStr,
-        total_ingresos: totalIngresos,
-        total_egresos: totalEgresos,
-        saldo_en_caja: saldoEnCaja,
-        para_organizacion: paraOrganizacion,
-        eventualidades: paraEventualidades,
-        observaciones: ''
-      });
-
-      if (arqueoError) throw arqueoError;
-
-      Alert.alert('Éxito', 'Arqueo registrado correctamente');
-    } catch (e) {
-      console.error(e);
-      Alert.alert('Error al calcular arqueo', e.message);
-    }
-  };
+  useEffect(() => {
+    cargarArqueos();
+  }, []);
 
   return (
     <PaperProvider>
       <ScrollView contentContainerStyle={styles.container}>
-        <Text variant="titleLarge">Arqueo de Caja</Text>
-
-        <Button
-          mode="outlined"
-          onPress={() => setShowInicioPicker(true)}
-          style={styles.input}
-        >
-          Fecha de inicio: {formatDate(fechaInicio)}
-        </Button>
-        {showInicioPicker && (
-          <DateTimePicker
-            value={fechaInicio}
-            mode="date"
-            display="default"
-            onChange={onChangeInicio}
-          />
-        )}
-
-        <Button
-          mode="outlined"
-          onPress={() => setShowFinPicker(true)}
-          style={styles.input}
-        >
-          Fecha de fin: {formatDate(fechaFin)}
-        </Button>
-        {showFinPicker && (
-          <DateTimePicker
-            value={fechaFin}
-            mode="date"
-            display="default"
-            onChange={onChangeFin}
-          />
-        )}
-
-        <Button mode="contained" onPress={realizarArqueo}>
-          Calcular y Guardar Arqueo
-        </Button>
+        <Text variant="titleLarge" style={styles.title}>Lista de Arqueos</Text>
+        {arqueos.map((arqueo) => (
+          <Card key={arqueo.id} style={styles.card}>
+            <Card.Title
+              title={arqueo.total_ninos || 'Sin descripción'}
+              subtitle={`Monto: S/. ${arqueo.total_sub} - Fecha: ${arqueo.fecha_inicio}`}
+              right={() => (
+                <View style={styles.iconContainer}>
+                  <IconButton
+                    icon={expandedId === arqueo.id ? 'chevron-up' : 'chevron-down'}
+                    onPress={() => toggleExpand(arqueo.id)}
+                  />
+                  <Menu
+                    visible={visibleMenuId === arqueo.id}
+                    onDismiss={closeMenu}
+                    anchor={
+                      <IconButton
+                        icon="dots-vertical"
+                        onPress={() => openMenu(arqueo.id)}
+                      />
+                    }
+                  >
+                    <Menu.Item
+                      onPress={() => {
+                        closeMenu();
+                        generarReportePDF(arqueo);
+                      }}
+                      title="Generar pdf"
+                      leadingIcon="file-pdf-box"
+                    />
+                  </Menu>
+                </View>
+              )}
+            />
+            {expandedId === arqueo.id && (
+              <Card.Content>
+                <Text variant="bodyMedium">Tipo: {arqueo.total_jovenes}</Text>
+                <Text variant="bodyMedium">Descripción: {arqueo.total_educacion || 'N/A'}</Text>
+              </Card.Content>
+            )}
+          </Card>
+        ))}
       </ScrollView>
+
+      <FAB
+        icon="plus"
+        style={styles.fab}
+        onPress={() => navigation.navigate('ArqueosForm')}
+      />
     </PaperProvider>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
-    paddingTop: 50
+    padding: 16,
+    paddingBottom: 100
   },
-  input: {
+  title: {
     marginBottom: 16
+  },
+  card: {
+    marginBottom: 12
+  },
+  iconContainer: {
+    flexDirection: 'row'
+  },
+  avatar: {
+    backgroundColor: '#b39ddb',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    margin: 8
+  },
+  fab: {
+    position: 'absolute',
+    right: 20,
+    bottom: 20
   }
 });
