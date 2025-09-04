@@ -59,7 +59,7 @@ export default function CardsScreen() {
                       onPress={async () => {
                         // Obtener recibos
                         const { data: recibos, error: errorRecibos } = await supabase
-                          .from('ReciboIg')
+                          .from('recibos')
                           .select('*')
                           .gte('fecha', arqueo.fecha_inicio)
                           .lte('fecha', arqueo.fecha_fin);

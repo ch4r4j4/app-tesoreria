@@ -36,7 +36,7 @@ export default function ArqueoScreen() {
       const fechaFinStr = formatDate(fechaFin);
 
       const { data, error } = await supabase
-        .from('ReciboIg')
+        .from('recibos')
         .select('*')
         .gte('fecha', fechaInicioStr)
         .lte('fecha', fechaFinStr);

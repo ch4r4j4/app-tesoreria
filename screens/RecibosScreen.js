@@ -15,7 +15,7 @@ export default function RecibosScreen() {
 
   const cargarRecibos = async () => {
     const { data, error } = await supabase
-      .from('ReciboIg')
+      .from('recibos')
       .select('*')
       .order('fecha', { ascending: false });
 

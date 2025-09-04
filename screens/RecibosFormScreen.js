@@ -76,7 +76,7 @@ export default function RecibosFormScreen({ navigation }) {
 
 		const fechaString = formatDate(fecha);
 
-    const tabla = tipoRecibo === 'Ingreso' ? 'ReciboIg' : 'egresos';
+    const tabla = tipoRecibo === 'Ingreso' ? 'recibos' : 'egresos';
 
     const data = {
       fecha: fechaString,
