@@ -52,25 +52,40 @@ export default function CardsScreen() {
                     icon={expandedId === arqueo.id ? 'chevron-up' : 'chevron-down'}
                     onPress={() => toggleExpand(arqueo.id)}
                   />
-                  <Menu
-                    visible={visibleMenuId === arqueo.id}
-                    onDismiss={closeMenu}
-                    anchor={
-                      <IconButton
-                        icon="dots-vertical"
-                        onPress={() => openMenu(arqueo.id)}
-                      />
-                    }
-                  >
-                    <Menu.Item
-                      onPress={() => {
-                        closeMenu();
-                        generarReportePDF(arqueo);
+                    <IconButton
+                      icon="file-pdf-box"
+                      iconColor="red"
+                      size={24}
+                      onPress={async () => {
+                        // Obtener recibos
+                        const { data: recibos, error: errorRecibos } = await supabase
+                          .from('ReciboIg')
+                          .select('*')
+                          .gte('fecha', arqueo.fecha_inicio)
+                          .lte('fecha', arqueo.fecha_fin);
+
+                        if (errorRecibos) {
+                          console.error("Error al obtener recibos:", errorRecibos.message);
+                          return;
+                        }
+
+                        // Obtener egresos
+                        const { data: egresos, error: errorEgresos } = await supabase
+                          .from('egresos')
+                          .select('*')
+                          .gte('fecha', arqueo.fecha_inicio)
+                          .lte('fecha', arqueo.fecha_fin);
+
+                        if (errorEgresos) {
+                          console.error("Error al obtener egresos:", errorEgresos.message);
+                          return;
+                        }
+
+                        // Generar el PDF con los tres argumentos
+                        await generarReportePDF(arqueo, recibos, egresos);
                       }}
-                      title="Generar pdf"
-                      leadingIcon="file-pdf-box"
+                      accessibilityLabel="Generar PDF"
                     />
-                  </Menu>
                 </View>
               )}
             />
