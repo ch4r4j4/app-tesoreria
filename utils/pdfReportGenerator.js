@@ -144,6 +144,13 @@ export const generarReportePDF = async (arqueo, recibos,egresos) => {
             font-weight: bold;
             background-color: #f9f9f9;
           }
+            tbody tr:nth-child(odd) {
+            background-color: #ffffff; /* Blanco */
+          }
+
+          tbody tr:nth-child(even) {
+            background-color: #f5f5f5; /* Gris claro tipo plomo */
+          }
         </style>
       </head>
       <body>

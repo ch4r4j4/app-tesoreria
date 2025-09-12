@@ -40,13 +40,27 @@ export default function RecibosScreen() {
               subtitle={`Nombre ${recibo.totalrcb} - Fecha: ${recibo.fecha}`}
               right={() => (
                 <View style={styles.iconContainer}>
+                  {/* Botón expandir/cerrar */}
                   <IconButton
                     icon={expandedId === recibo.id ? 'chevron-up' : 'chevron-down'}
                     onPress={() => toggleExpand(recibo.id)}
+                    style={styles.iconButton}
                   />
+
+                  {/* Botón eliminar */}
                   <IconButton
-                    icon="dots-vertical"
+                    icon="delete"
+                    iconColor="red"
+                    onPress={() => console.log('Eliminar', recibo.id)}
+                    style={styles.iconButton}
+                  />
+
+                  {/* Botón editar/actualizar */}
+                  <IconButton
+                    icon="pencil"
+                    iconColor="blue"
                     onPress={() => console.log('Editar', recibo.id)}
+                    style={styles.iconButton}
                   />
                 </View>
               )}
@@ -82,7 +96,13 @@ const styles = StyleSheet.create({
     marginBottom: 12
   },
   iconContainer: {
-    flexDirection: 'row'
+    flexDirection: 'row',
+    padding:0,
+    margin:0
+  },
+  iconButton: {
+    margin: 0,
+    padding: 0,
   },
   avatar: {
     backgroundColor: '#b39ddb',
