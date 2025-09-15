@@ -3,6 +3,10 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 import { Text, Card, IconButton, FAB, Provider as PaperProvider } from 'react-native-paper';
 import { supabase } from '../lib/supabase';
 import { useNavigation } from '@react-navigation/native';
+import DeleteButton from './components/DeleteButoon';
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback } from "react";
+import EditButton from './components/EditButton';
 
 export default function RecibosScreen() {
   const navigation = useNavigation();
@@ -24,9 +28,11 @@ export default function RecibosScreen() {
     }
   };
 
-  useEffect(() => {
-    cargarRecibos();
-  }, []);
+  useFocusEffect(
+  useCallback(() => {
+      cargarRecibos();
+    }, [])
+  );
 
   return (
     <PaperProvider>
@@ -46,22 +52,15 @@ export default function RecibosScreen() {
                     onPress={() => toggleExpand(recibo.id)}
                     style={styles.iconButton}
                   />
-
-                  {/* Botón eliminar */}
-                  <IconButton
-                    icon="delete"
-                    iconColor="red"
-                    onPress={() => console.log('Eliminar', recibo.id)}
-                    style={styles.iconButton}
+                  <DeleteButton
+                    id={recibo.id}
+                    resource="recibos"
+                    onDeleted={(deletedId) =>
+                      setRecibos((prev) => prev.filter((item) => item.id !== deletedId))
+                    }
                   />
-
                   {/* Botón editar/actualizar */}
-                  <IconButton
-                    icon="pencil"
-                    iconColor="blue"
-                    onPress={() => console.log('Editar', recibo.id)}
-                    style={styles.iconButton}
-                  />
+                  <EditButton  />
                 </View>
               )}
             />

@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { Text, Card, IconButton, FAB, Provider as PaperProvider } from 'react-native-paper';
+import { Text, Card, FAB, Provider as PaperProvider } from 'react-native-paper';
 import { supabase } from '../lib/supabase';
 import { useNavigation } from '@react-navigation/native';
-import { generarReportePDF } from '../utils/pdfReportGenerator';
 import ExpandButton from './components/ExpandButton';
+import GeneratePdfButton from './components/GeneratePdfButton';
+import DeleteButton from './components/DeleteButoon';
 
 export default function CardsScreen() {
   const navigation = useNavigation();
@@ -53,54 +54,13 @@ export default function CardsScreen() {
                     expandedId={expandedId}
                     onToggle={toggleExpand}
                   />
-                  <IconButton
-                    icon="file-pdf-box"
-                    iconColor="red"
-                    size={24}
-                    style={styles.iconButton}
-                    onPress={async () => {
-                      // Obtener recibos
-                      const { data: recibos, error: errorRecibos } = await supabase
-                        .from('recibos')
-                        .select('*')
-                        .gte('fecha', arqueo.fecha_inicio)
-                        .lte('fecha', arqueo.fecha_fin);
-
-                      if (errorRecibos) {
-                        console.error("Error al obtener recibos:", errorRecibos.message);
-                        return;
-                      }
-
-                      // Obtener egresos
-                      const { data: egresos, error: errorEgresos } = await supabase
-                        .from('egresos')
-                        .select('*')
-                        .gte('fecha', arqueo.fecha_inicio)
-                        .lte('fecha', arqueo.fecha_fin);
-
-                      if (errorEgresos) {
-                        console.error("Error al obtener egresos:", errorEgresos.message);
-                        return;
-                      }
-
-                      // Generar el PDF con los tres argumentos
-                      await generarReportePDF(arqueo, recibos, egresos);
-                    }}
-                    accessibilityLabel="Generar PDF"
-                  />
-                  <IconButton
-                    icon="delete"
-                    iconColor="red"
-                    onPress={() => console.log('Eliminar', recibo.id)}
-                    style={styles.iconButton}
-                  />
-
-                  {/* Botón editar/actualizar */}
-                  <IconButton
-                    icon="pencil"
-                    iconColor="blue"
-                    onPress={() => console.log('Editar', recibo.id)}
-                    style={styles.iconButton}
+                  <GeneratePdfButton arqueo={arqueo}/>
+                  <DeleteButton
+                    id={arqueo.id}
+                    resource="arqueos"
+                    onDeleted={(deletedId) =>
+                      setArqueos((prev) => prev.filter((item) => item.id !== deletedId))
+                    }
                   />
                 </View>
               )}

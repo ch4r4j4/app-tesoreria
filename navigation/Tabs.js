@@ -2,7 +2,7 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import DashboardScreen from '../screens/DashboardScreen';
 import RecibosScreen from '../screens/RecibosScreen';
-import ArqueoScreen from '../screens/ArqueosScreen';
+import ArqueoScreen from '../screens/Arqueosscreen';
 
 const Tab = createBottomTabNavigator();
 
