@@ -98,7 +98,7 @@ export default function RecibosScreen() {
       <FAB
         icon="plus"
         style={styles.fab}
-        onPress={() => navigation.navigate('RecibosForm')}
+        onPress={() => navigation.navigate('RecibosFormNew')}
       />
     </PaperProvider>
   );
