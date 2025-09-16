@@ -111,7 +111,7 @@ export default function RecibosFormScreen({route, navigation }) {
       ({ error } = await supabase.from(tabla).update(data).eq("id", item.id));
     } else {
       // 👈 INSERT
-      ({ error } = await supabase.from(tabla).insert(data));
+      ({ error } = await supabase.from(tabla).insert(data));  
     }
 
     if (error) {
