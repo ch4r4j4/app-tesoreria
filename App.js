@@ -1,11 +1,15 @@
-import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import MainStackNavigator from './MainStackNavigator';
+// App.js
+import React from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { Provider as PaperProvider } from "react-native-paper"; // 👈 importa el Provider
+import MainStackNavigator from "./MainStackNavigator";
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <MainStackNavigator />
-    </NavigationContainer>
+    <PaperProvider>
+      <NavigationContainer>
+        <MainStackNavigator />
+      </NavigationContainer>
+    </PaperProvider>
   );
 }
