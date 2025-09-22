@@ -1,6 +1,7 @@
-import * as Print from 'expo-print';
-import * as Sharing from 'expo-sharing';
-
+import * as Print from "expo-print";
+import * as FileSystem from "expo-file-system/legacy";
+import { decode } from "base64-arraybuffer";
+import { supabase } from "../lib/supabase";
 
 export const generarReportePDF = async (arqueo, recibos,egresos) => {
   // Calcular totales
@@ -260,13 +261,35 @@ export const generarReportePDF = async (arqueo, recibos,egresos) => {
     </html>
   `;
 
-  const { uri } = await Print.printToFileAsync({
+   const { uri } = await Print.printToFileAsync({
     html,
-    width: 842,  // A4 landscape
+    width: 842,
     height: 595,
-    base64: false
+    base64: false,
   });
 
-  await Sharing.shareAsync(uri);
+  // Convertir a base64
+  const base64 = await FileSystem.readAsStringAsync(uri, { encoding: "base64" });
+
+  // Ruta en Storage
+  const filePath = `arqueos/arqueo_${arqueo.id}.pdf`;
+
+  // Subir a Storage
+  const { error: uploadError } = await supabase.storage
+    .from("pdfs")
+    .upload(filePath, decode(base64), {
+      contentType: "application/pdf",
+      upsert: true,
+    });
+
+  if (uploadError) throw uploadError;
+
+  // Obtener URL pública
+  const { data } = supabase.storage.from("pdfs").getPublicUrl(filePath);
+
+  // Guardar URL en la fila
+  await supabase.from("arqueos").update({ pdf_url: data.publicUrl }).eq("id", arqueo.id);
+
+  return data.publicUrl;
 
 };
