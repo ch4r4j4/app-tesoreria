@@ -20,10 +20,16 @@
         "foregroundImage": "./assets/icon_02.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.sirmantequilla.apptesoreria"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "3406061d-367c-43eb-979a-e48efed1355e"
+      }
     }
   }
 }

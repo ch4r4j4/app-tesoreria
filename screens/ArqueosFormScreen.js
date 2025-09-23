@@ -1,6 +1,6 @@
 // ArqueosFormScreen.js
-import React, { useState } from "react";
-import { StyleSheet, Alert, ScrollView } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, StyleSheet, Alert, ScrollView } from "react-native";
 import { Text, Button, Provider as PaperProvider } from "react-native-paper";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { supabase } from "../lib/supabase";
@@ -9,11 +9,42 @@ import { generarReportePDF } from "../utils/pdfReportGenerator";
 export default function ArqueoScreen() {
   const [fechaInicio, setFechaInicio] = useState(new Date());
   const [fechaFin, setFechaFin] = useState(new Date());
+  const [saldoInicial, setSaldoInicial] = useState(0);
 
   const [showInicioPicker, setShowInicioPicker] = useState(false);
   const [showFinPicker, setShowFinPicker] = useState(false);
 
-  const formatDate = (date) => date.toLocaleDateString("en-CA"); // YYYY-MM-DD
+  // 🔧 Función para formatear fecha YYYY-MM-DD
+  const formatDate = (date) => date.toLocaleDateString("en-CA");
+
+  // Al montar la pantalla, traer último arqueo
+  useEffect(() => {
+    const fetchLastArqueo = async () => {
+      const { data: lastArqueo, error } = await supabase
+        .from("arqueos")
+        .select("*")
+        .order("fecha_fin", { ascending: false })
+        .limit(1)
+        .single();
+
+      if (error) {
+        console.log("ℹ️ No hay arqueos previos, se inicia en 0");
+        return;
+      }
+
+      if (lastArqueo) {
+        // saldo inicial = saldo final del último arqueo
+        setSaldoInicial(lastArqueo.saldo_final || 0);
+
+        // fecha inicio = día siguiente al último arqueo
+        const nextDay = new Date(lastArqueo.fecha_fin);
+        nextDay.setDate(nextDay.getDate() + 1);
+        setFechaInicio(nextDay);
+      }
+    };
+
+    fetchLastArqueo();
+  }, []);
 
   const onChangeInicio = (event, selectedDate) => {
     setShowInicioPicker(false);
@@ -30,7 +61,7 @@ export default function ArqueoScreen() {
       const fechaInicioStr = formatDate(fechaInicio);
       const fechaFinStr = formatDate(fechaFin);
 
-      console.log("⏳ Fechas seleccionadas:", { fechaInicioStr, fechaFinStr });
+      console.log("⏳ Fechas:", fechaInicioStr, fechaFinStr);
 
       // 📌 1. Traer recibos del rango
       const { data: recibos, error: errorRecibos } = await supabase
@@ -40,103 +71,39 @@ export default function ArqueoScreen() {
         .lte("fecha", fechaFinStr);
 
       if (errorRecibos) throw errorRecibos;
-      console.log("✅ Recibos obtenidos:", recibos.length);
 
-      // 📌 2. Calcular totales
-      let total_primicia = 0,
-        total_diezmo = 0,
-        total_pobres = 0,
-        total_agradecimiento = 0,
-        total_escsab = 0,
-        total_jovenes = 0,
-        total_adolescentes = 0,
-        total_ninos = 0,
-        total_educacion = 0,
-        total_salud = 0,
-        total_obramis = 0,
-        total_musica = 0,
-        total_renuevatv = 0,
-        total_primersab = 0,
-        total_semorac = 0,
-        total_misextranj = 0,
-        total_construccion = 0,
-        total_diversos = 0,
-        total_sub = 0;
+      // 📌 2. Calcular totales de ingresos
+      let totales = {
+        primicia: 0, diezmo: 0, pobres: 0, agradecimiento: 0,
+        escsab: 0, jovenes: 0, adolescentes: 0, ninos: 0,
+        educacion: 0, salud: 0, obramis: 0, musica: 0,
+        renuevatv: 0, primersab: 0, semorac: 0, misextranj: 0,
+        construccion: 0, diversos: 0, sub: 0,
+      };
 
-      recibos.forEach((recibo) => {
-        total_primicia += recibo.primicia || 0;
-        total_diezmo += recibo.diezmo || 0;
-        total_pobres += recibo.pobres || 0;
-        total_agradecimiento += recibo.agradecimiento || 0;
-        total_escsab += recibo.esc_sabatica || 0;
-        total_jovenes += recibo.jovenes || 0;
-        total_adolescentes += recibo.adolescentes || 0;
-        total_ninos += recibo.ninos || 0;
-        total_educacion += recibo.educacion || 0;
-        total_salud += recibo.salud || 0;
-        total_obramis += recibo.obra_mis || 0;
-        total_musica += recibo.musica || 0;
-        total_renuevatv += recibo.renuevatv || 0;
-        total_primersab += recibo.primer_sabado || 0;
-        total_semorac += recibo.sem_oracion || 0;
-        total_misextranj += recibo.mis_extranj || 0;
-        total_construccion += recibo.construccion || 0;
-        total_diversos += recibo.diversos || 0;
-        total_sub += recibo.totalrcb || 0;
+      recibos.forEach((r) => {
+        totales.primicia += r.primicia || 0;
+        totales.diezmo += r.diezmo || 0;
+        totales.pobres += r.pobres || 0;
+        totales.agradecimiento += r.agradecimiento || 0;
+        totales.escsab += r.esc_sabatica || 0;
+        totales.jovenes += r.jovenes || 0;
+        totales.adolescentes += r.adolescentes || 0;
+        totales.ninos += r.ninos || 0;
+        totales.educacion += r.educacion || 0;
+        totales.salud += r.salud || 0;
+        totales.obramis += r.obra_mis || 0;
+        totales.musica += r.musica || 0;
+        totales.renuevatv += r.renuevatv || 0;
+        totales.primersab += r.primer_sabado || 0;
+        totales.semorac += r.sem_oracion || 0;
+        totales.misextranj += r.mis_extranj || 0;
+        totales.construccion += r.construccion || 0;
+        totales.diversos += r.diversos || 0;
+        totales.sub += r.totalrcb || 0;
       });
 
-      console.log("📊 Totales calculados:", {
-        total_primicia,
-        total_diezmo,
-        total_sub,
-      });
-
-      // 📌 3. Insertar arqueo
-      const { error: arqueoError } = await supabase.from("arqueos").insert(
-        {
-          fecha_inicio: fechaInicioStr,
-          fecha_fin: fechaFinStr,
-          total_primicia,
-          total_diezmo,
-          total_pobres,
-          total_agradecimiento,
-          total_escsab,
-          total_jovenes,
-          total_adolescentes,
-          total_ninos,
-          total_educacion,
-          total_salud,
-          total_obramis,
-          total_musica,
-          total_renuevatv,
-          total_primersab,
-          total_semorac,
-          total_misextranj,
-          total_construccion,
-          total_diversos,
-          total_sub,
-        },
-        { returning: "minimal" }
-      );
-
-      if (arqueoError) throw arqueoError;
-      console.log("✅ Insert en arqueos realizado correctamente");
-
-      // 📌 4. Delay para timing
-      await new Promise((resolve) => setTimeout(resolve, 300));
-
-      // 📌 5. Obtener último arqueo insertado
-      const { data: insertedRows, error: selectError } = await supabase
-        .from("arqueos")
-        .select("*")
-        .order("id", { ascending: false })
-        .limit(1);
-
-      if (selectError) throw selectError;
-      const insertedArqueo = insertedRows[0];
-      console.log("✅ Último arqueo recuperado:", insertedArqueo);
-
-      // 📌 6. Traer egresos
+      // 📌 3. Traer egresos del rango
       const { data: egresos, error: errorEgresos } = await supabase
         .from("egresos")
         .select("*")
@@ -144,16 +111,51 @@ export default function ArqueoScreen() {
         .lte("fecha", fechaFinStr);
 
       if (errorEgresos) throw errorEgresos;
-      console.log("✅ Egresos obtenidos:", egresos.length);
 
-      // 📌 7. Generar y guardar PDF
-      await generarReportePDF(insertedArqueo, recibos, egresos);
-      console.log("📄 PDF generado y guardado en Supabase Storage");
+      const totalEgresos = egresos.reduce((acc, e) => acc + (e.totalrcb || 0), 0);
+
+      // 📌 4. Calcular saldo final
+      const saldoFinal = saldoInicial + totales.sub - totalEgresos;
+
+      // 📌 5. Insertar arqueo en la tabla
+      const { data: inserted, error: arqueoError } = await supabase
+        .from("arqueos")
+        .insert({
+          fecha_inicio: fechaInicioStr,
+          fecha_fin: fechaFinStr,
+          total_primicia: totales.primicia,
+          total_diezmo: totales.diezmo,
+          total_pobres: totales.pobres,
+          total_agradecimiento: totales.agradecimiento,
+          total_escsab: totales.escsab,
+          total_jovenes: totales.jovenes,
+          total_adolescentes: totales.adolescentes,
+          total_ninos: totales.ninos,
+          total_educacion: totales.educacion,
+          total_salud: totales.salud,
+          total_obramis: totales.obramis,
+          total_musica: totales.musica,
+          total_renuevatv: totales.renuevatv,
+          total_primersab: totales.primersab,
+          total_semorac: totales.semorac,
+          total_misextranj: totales.misextranj,
+          total_construccion: totales.construccion,
+          total_diversos: totales.diversos,
+          total_sub: totales.sub,
+          saldo_inicial: saldoInicial,
+          saldo_final: saldoFinal,
+        })
+        .select();
+
+      if (arqueoError) throw arqueoError;
+
+      // 📌 6. Generar y subir PDF
+      await generarReportePDF(inserted[0], recibos, egresos);
 
       Alert.alert("Éxito", "Arqueo registrado y PDF generado correctamente");
     } catch (e) {
       console.error("❌ Error en realizarArqueo:", e);
-      Alert.alert("Error al calcular arqueo", e.message);
+      Alert.alert("Error", e.message || "Ocurrió un problema");
     }
   };
 
@@ -161,6 +163,7 @@ export default function ArqueoScreen() {
     <PaperProvider>
       <ScrollView contentContainerStyle={styles.container}>
         <Text variant="titleLarge">Arqueo de Caja</Text>
+        <Text style={{ marginBottom: 10 }}>Saldo inicial: S/. {saldoInicial.toFixed(2)}</Text>
 
         <Button
           mode="outlined"
