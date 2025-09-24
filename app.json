@@ -3,6 +3,19 @@
     "name": "app-tesoreria",
     "slug": "app-tesoreria",
     "version": "1.0.0",
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 35,
+            "targetSdkVersion": 35,
+            "minSdkVersion": 24,
+            "kotlinVersion": "2.0.21"
+          }
+        }
+      ]
+    ],
     "orientation": "portrait",
     "icon": "./assets/images.png",
     "userInterfaceStyle": "light",
