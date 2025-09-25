@@ -3,19 +3,6 @@
     "name": "app-tesoreria",
     "slug": "app-tesoreria",
     "version": "1.0.0",
-    "plugins": [
-      [
-        "expo-build-properties",
-        {
-          "android": {
-            "compileSdkVersion": 35,
-            "targetSdkVersion": 35,
-            "minSdkVersion": 24,
-            "kotlinVersion": "2.0.21"
-          }
-        }
-      ]
-    ],
     "orientation": "portrait",
     "icon": "./assets/images.png",
     "userInterfaceStyle": "light",
@@ -39,6 +26,19 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 35,
+            "targetSdkVersion": 35,
+            "minSdkVersion": 24,
+            "kotlinVersion": "2.0.21"
+          }
+        }
+      ]
+    ],
     "extra": {
       "eas": {
         "projectId": "3406061d-367c-43eb-979a-e48efed1355e"
